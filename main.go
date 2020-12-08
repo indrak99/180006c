@@ -82,7 +82,6 @@ func RequestSetAnt(conn *net.UDPConn) {
 // listen listen read from replay
 func listen(connection *net.UDPConn, quit chan struct{}) {
 	buffer := make([]byte, 30)
-	var s string
 	var req MiTagReq
 
 	_, _, err := 0, new(net.UDPAddr), error(nil)
@@ -90,21 +89,18 @@ func listen(connection *net.UDPConn, quit chan struct{}) {
 		_, _, err = connection.ReadFromUDP(buffer)
 		if err == nil {
 			if buffer[0] == 0xF0 {
-				//fmt.Println("from: ", remoteAddr, fmt.Sprintf("%0x", buffer[0:16]))
-				s = ""
+				s := ""
 				n := int(buffer[1])
 				for i := 5; i <= n; i++ {
 					s += fmt.Sprintf("%02x", buffer[i])
 				}
 				req.Encode = s
 				req.MiTag()
-				fmt.Println("Status: ", req.Status)
 			}
 			time.Sleep(time.Millisecond * 125)
 			go RequestReadMsg(connection)
 		}
 	}
-	fmt.Println("listener failed - ", err)
 	quit <- struct{}{}
 }
 
